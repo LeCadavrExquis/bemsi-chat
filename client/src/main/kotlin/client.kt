@@ -7,7 +7,7 @@ import react.dom.h1
 fun main() {
     window.onload = {
         render(document.getElementById("root")) {
-            h1 {+"BEMSIChat App"}
+            app { }
         }
     }
 }
