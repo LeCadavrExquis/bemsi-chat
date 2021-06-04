@@ -1,13 +1,18 @@
+import declarations.avatar
 import declarations.conversation
 import declarations.conversationList
 import kotlinx.css.*
+import model.MessagingChannel
 import react.*
 import react.dom.h2
-import react.dom.h3
 import styled.css
 import styled.styledDiv
 
-class FriendsList : RComponent<RProps, RState>() {
+external interface FriendsListProps : RProps {
+    var channels: List<MessagingChannel>
+}
+
+class FriendsList : RComponent<FriendsListProps, RState>() {
     override fun RBuilder.render() {
         styledDiv {
             css {
@@ -17,25 +22,13 @@ class FriendsList : RComponent<RProps, RState>() {
             }
             h2 {+"Friends List: "}
             conversationList {
-                conversation {
-                    attrs {
-                        name = "Filip"
-                        lastSenderName = "Ty"
-                        info = "elo elo 320"
+                props.channels.forEach {
+                    avatar{
+                        attrs.name = it.name
+                        attrs.src = it.iconSrc
                     }
-                }
-                conversation {
-                    attrs {
-                        name = "Paweł"
-                        lastSenderName = "Paweł"
-                        info = "test 123"
-                    }
-                }
-                conversation {
-                    attrs {
-                        name = "Twój stary"
-                        lastSenderName = "Twój stary"
-                        info = " pijany"
+                    conversation {
+                        attrs.name = it.name
                     }
                 }
             }
@@ -43,7 +36,7 @@ class FriendsList : RComponent<RProps, RState>() {
     }
 }
 
-fun RBuilder.friendsList(handler: RProps.() -> Unit): ReactElement {
+fun RBuilder.friendsList(handler: FriendsListProps.() -> Unit): ReactElement {
     return child(FriendsList::class) {
         this.attrs(handler)
     }

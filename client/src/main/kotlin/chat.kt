@@ -23,6 +23,26 @@ class Chat : RComponent<ChatProps, RState>() {
             }
             mainContainer {
                 chatContainer {
+                    child(ConversationHeader::class) {
+                        avatar {
+                            val avatarIdx = when(props.friendName) {
+                                "Paweł" -> 1
+                                "Michał" -> 2
+                                "Marysia" -> 3
+                                "Filip" -> 4
+                                else -> 1
+                            }
+                            attrs {
+                                src = "avatars/avatar$avatarIdx.svg"
+                                name = props.friendName
+                            }
+                        }
+                        child(ConversationHeader.Content::class) {
+                            attrs {
+                                userName = props.friendName
+                            }
+                        }
+                    }
                     messageList {
                         props.messages.forEach {
                             messageBubble {

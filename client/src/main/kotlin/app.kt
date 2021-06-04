@@ -1,5 +1,4 @@
 import kotlinx.css.*
-import model.Conversation
 import model.Message
 import model.User
 import react.*
@@ -7,27 +6,15 @@ import styled.css
 import styled.styledDiv
 import styled.styledH1
 
+external interface AppState : RState {
+    var user: User
+    var messages: List<Message>
+    var friendName: String
+}
+
 class App : RComponent<RProps, AppState>() {
     @Suppress("unused")
     val styles = kotlinext.js.require("@chatscope/chat-ui-kit-styles/dist/default/styles.min.css")
-
-    override fun AppState.init() {
-        user = User("12345", "Alicja")
-        conversations = listOf(
-            Conversation("Alfred", "You", "hej"),
-            Conversation("Anastazja", "Anastazja", "co tam?"),
-            Conversation("Antoni", "Antoni", "serwus !")
-        )
-        messages = listOf(
-            Message("hejka", "incoming", "Amelia"),
-            Message("elko", "outgoing", "Amelia"),
-            Message("test1", "incoming", "Amelia"),
-            Message("test2", "incoming", "Amelia"),
-            Message("test3", "incoming", "Amelia"),
-            Message("oki", "outgoing", "Amelia"),
-            Message("doki", "outgoing", "Amelia")
-        )
-    }
 
     override fun RBuilder.render() {
         styledH1 {
@@ -42,9 +29,11 @@ class App : RComponent<RProps, AppState>() {
             css {
                 display = Display.flow
             }
-            friendsList {  }
+            friendsList {
+                channels = state.user.getChannels()
+            }
             chat {
-                friendName = "Amelia"
+                friendName = state.friendName
                 messages = state.messages
                 onSend = { msg ->
                     //TODO: send to backend
@@ -58,12 +47,25 @@ class App : RComponent<RProps, AppState>() {
             }
         }
     }
-}
 
-external interface AppState : RState {
-    var user: User
-    var conversations: List<Conversation>
-    var messages: List<Message>
+    override fun AppState.init() {
+        user = User("12345", "Alicja", listOf(
+            "Paweł",
+            "Michał",
+            "Marysia",
+            "Filip"
+        ))
+        messages = listOf(
+            Message("hejka", "incoming", "Michał"),
+            Message("elko", "outgoing", "Michał"),
+            Message("test1", "incoming", "Michał"),
+            Message("test2", "incoming", "Michał"),
+            Message("test3", "incoming", "Michał"),
+            Message("oki", "outgoing", "Michał"),
+            Message("doki", "outgoing", "Michał")
+        )
+        friendName = "Michał"
+    }
 }
 
 fun RBuilder.app(handler: RProps.() -> Unit) : ReactElement {
