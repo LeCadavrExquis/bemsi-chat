@@ -1,9 +1,7 @@
 import declarations.*
 import kotlinx.css.*
 import model.Message
-import org.w3c.dom.NodeList
 import react.*
-import react.dom.render
 import styled.css
 import styled.styledDiv
 import kotlin.js.json
@@ -11,6 +9,7 @@ import kotlin.js.json
 external interface ChatProps: RProps {
     var friendName: String
     var messages: List<Message>
+    var onSend: (String) -> Unit
 }
 
 class Chat : RComponent<ChatProps, RState>() {
@@ -29,7 +28,6 @@ class Chat : RComponent<ChatProps, RState>() {
                             messageBubble {
                                 attrs.model = json(
                                     "message" to it.message,
-                                    "sentTime" to "",
                                     "direction" to it.direction,
                                     "sender" to it.sender,
                                     "position" to "single"
@@ -39,12 +37,9 @@ class Chat : RComponent<ChatProps, RState>() {
                     }
                     messageInput {
                         attrs.placeholder = "type message"
-//                        attrs.onSend = { event: dynamic ->
-//                            console.log(event)
-////                            props.sendMessage(
-////                                Message(event["textContent"] as String, "outgoing", "You")
-////                            )
-//                        }
+                        attrs.onSend =  { _, _, innerText, _ ->
+                            props.onSend(innerText)
+                        }
                     }
                 }
             }

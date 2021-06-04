@@ -46,11 +46,15 @@ class App : RComponent<RProps, AppState>() {
             chat {
                 friendName = "Amelia"
                 messages = state.messages
-//                sendMessage = { msg ->
-//                    setState {
-//                        state.messages = state.messages + msg
-//                    }
-//                }
+                onSend = { msg ->
+                    //TODO: send to backend
+                    setState {
+                        messages = messages + Message(
+                                    message = msg,
+                                    direction = "outgoing",
+                                    sender = user.name)
+                    }
+                }
             }
         }
     }
