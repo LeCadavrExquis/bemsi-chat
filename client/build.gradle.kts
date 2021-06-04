@@ -20,13 +20,13 @@ repositories {
 //    implementation("org.jetbrains:kotlin-react-router-dom:5.2.0-pre.148-kotlin-1.4.30")
 //}
 kotlin {
-    js(IR) {
+    js(LEGACY) {
         useCommonJs()
-        binaries.executable()
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
             }
+            binaries.executable()
         }
     }
     sourceSets {
@@ -38,10 +38,12 @@ kotlin {
                 implementation("org.jetbrains:kotlin-react-router-dom:5.2.0-pre.148-kotlin-1.4.30")
                 implementation("org.jetbrains:kotlin-redux:4.0.5-pre.148-kotlin-1.4.30")
                 implementation("org.jetbrains:kotlin-react-redux:7.2.2-pre.148-kotlin-1.4.30")
+
+                implementation(npm("jquery", "3.6.0"))
+                implementation(npm("react-bootstrap", "1.6.0"))
+                implementation(npm("@chatscope/chat-ui-kit-react", "1.8.1"))
+                implementation(npm("@chatscope/chat-ui-kit-styles", "1.2.0"))
             }
         }
     }
 }
-//tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
-//    outputFileName = "js.js"
-//}
