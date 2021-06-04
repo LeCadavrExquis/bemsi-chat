@@ -1,18 +1,34 @@
-import declarations.*
 import kotlinx.css.*
+import model.Conversation
 import model.Message
 import model.User
 import react.*
-import react.dom.div
-import react.dom.h1
-import react.dom.h2
 import styled.css
 import styled.styledDiv
 import styled.styledH1
-import kotlin.js.json
 
-class App : RComponent<RProps, RState>() {
+class App : RComponent<RProps, AppState>() {
+    @Suppress("unused")
     val styles = kotlinext.js.require("@chatscope/chat-ui-kit-styles/dist/default/styles.min.css")
+
+    override fun AppState.init() {
+        user = User("12345", "Alicja")
+        conversations = listOf(
+            Conversation("Alfred", "You", "hej"),
+            Conversation("Anastazja", "Anastazja", "co tam?"),
+            Conversation("Antoni", "Antoni", "serwus !")
+        )
+        messages = listOf(
+            Message("hejka", "incoming", "Amelia"),
+            Message("elko", "outgoing", "Amelia"),
+            Message("test1", "incoming", "Amelia"),
+            Message("test2", "incoming", "Amelia"),
+            Message("test3", "incoming", "Amelia"),
+            Message("oki", "outgoing", "Amelia"),
+            Message("doki", "outgoing", "Amelia")
+        )
+    }
+
     override fun RBuilder.render() {
         styledH1 {
             +"Bemsi Chat App"
@@ -27,20 +43,25 @@ class App : RComponent<RProps, RState>() {
                 display = Display.flow
             }
             friendsList {  }
-            chat {  }
+            chat {
+                friendName = "Amelia"
+                messages = state.messages
+//                sendMessage = { msg ->
+//                    setState {
+//                        state.messages = state.messages + msg
+//                    }
+//                }
+            }
         }
-//        Container {
-//            Row {
-//                Col {
-//
-//                }
-//                Col {
-//
-//                }
-//            }
-//        }
     }
 }
+
+external interface AppState : RState {
+    var user: User
+    var conversations: List<Conversation>
+    var messages: List<Message>
+}
+
 fun RBuilder.app(handler: RProps.() -> Unit) : ReactElement {
     return child(App::class) {
         this.attrs(handler)

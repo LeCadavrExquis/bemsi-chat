@@ -1,18 +1,19 @@
 import declarations.*
 import kotlinx.css.*
 import model.Message
+import org.w3c.dom.NodeList
 import react.*
 import react.dom.render
 import styled.css
 import styled.styledDiv
 import kotlin.js.json
 
-interface ChatProps: RProps {
-    //TODO: implement
+external interface ChatProps: RProps {
+    var friendName: String
     var messages: List<Message>
 }
 
-class Chat : RComponent<RProps, RState>() {
+class Chat : RComponent<ChatProps, RState>() {
     override fun RBuilder.render() {
         styledDiv {
             css {
@@ -24,34 +25,26 @@ class Chat : RComponent<RProps, RState>() {
             mainContainer {
                 chatContainer {
                     messageList {
-                        messageBubble {
-                            model = json(
-                                "message" to "Elooooooooooooooooooooooooo",
-                                "sentTime" to "just now",
-                                "sender" to "Twoja stara"
-                            )
-                        }
-                        messageBubble {
-                            model = json(
-                                "message" to "Elooooooooooooooooooooooooo",
-                                "sentTime" to "just now",
-                                "sender" to "Twoja stara"
-                            )
-                        }
-                        messageBubble {
-                            model = json(
-                                "message" to "Elooooooooooooooooooooooooo",
-                                "sentTime" to "just now",
-                                "sender" to "Twoja stara"
-                            )
-                        }
-                        messageFooter {
-                            sender = "Twoja stara"
-                            sentTime = "teraz i zawsze"
+                        props.messages.forEach {
+                            messageBubble {
+                                attrs.model = json(
+                                    "message" to it.message,
+                                    "sentTime" to "",
+                                    "direction" to it.direction,
+                                    "sender" to it.sender,
+                                    "position" to "single"
+                                )
+                            }
                         }
                     }
                     messageInput {
-                        attrs.placeholder = "type msg"
+                        attrs.placeholder = "type message"
+//                        attrs.onSend = { event: dynamic ->
+//                            console.log(event)
+////                            props.sendMessage(
+////                                Message(event["textContent"] as String, "outgoing", "You")
+////                            )
+//                        }
                     }
                 }
             }
@@ -59,20 +52,8 @@ class Chat : RComponent<RProps, RState>() {
     }
 }
 
-fun RBuilder.chat(handler: RProps.() -> Unit): ReactElement {
+fun RBuilder.chat(handler: ChatProps.() -> Unit): ReactElement {
     return child(Chat::class) {
-        this.attrs(handler)
-    }
-}
-
-fun RBuilder.messageBubble(handler: MessageProps.() -> Unit): ReactElement {
-    return child(MessageBubble::class) {
-        this.attrs(handler)
-    }
-}
-
-fun RBuilder.messageFooter(handler: FooterProps.() -> Unit): ReactElement {
-    return child(MessageBubble.Footer::class) {
         this.attrs(handler)
     }
 }

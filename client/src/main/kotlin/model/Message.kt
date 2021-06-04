@@ -1,3 +1,3 @@
 package model
 
-data class Message(val message: String, val sentTime: String, val sender: String)
+data class Message(val message: String, val direction: String, val sender: String)
