@@ -1,10 +1,12 @@
 package com.example.bemsichat.controller;
 
+import com.example.bemsichat.model.ChatMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class ChatController {
@@ -13,16 +15,21 @@ public class ChatController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @GetMapping("/addMessage")
-    public String add(@RequestParam String message){
+    @PostMapping(path = "/addMessage", consumes = "application/json", produces = "application/json")
+    public String add(@RequestBody ChatMessage message){
         rabbitTemplate.convertAndSend(QUEUE_NAME,message);
         return "Done!";
     }
 
-    @GetMapping("/receiveMessage")
-    public String receive(){
-        Object message = rabbitTemplate.receiveAndConvert(QUEUE_NAME);
-        return message.toString();
+    @GetMapping(path = "/receiveMessage", produces = "application/json")
+    public List<ChatMessage> receive(){
+        List<ChatMessage> messages = new ArrayList<>();
+        while(true){
+            ChatMessage message = (ChatMessage) rabbitTemplate.receiveAndConvert(QUEUE_NAME);
+            if (message == null){
+                return messages;
+            }
+            messages.add(message);
+        }
     }
-
 }
