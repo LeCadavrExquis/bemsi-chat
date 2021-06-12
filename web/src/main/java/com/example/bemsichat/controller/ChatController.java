@@ -16,9 +16,8 @@ public class ChatController {
     private RabbitTemplate rabbitTemplate;
 
     @PostMapping(path = "/addMessage", consumes = "application/json", produces = "application/json")
-    public String add(@RequestBody ChatMessage message){
+    public void add(@RequestBody ChatMessage message){
         rabbitTemplate.convertAndSend(QUEUE_NAME,message);
-        return "Done!";
     }
 
     @GetMapping(path = "/receiveMessage", produces = "application/json")
