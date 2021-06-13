@@ -17,7 +17,12 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-amqp")
+//    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+//    implementation("org.springframework.boot:spring-boot-starter-reactor-netty")
+//    implementation("org.springframework:spring-messaging")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.10.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.10.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     compileOnly ("org.projectlombok:lombok")
