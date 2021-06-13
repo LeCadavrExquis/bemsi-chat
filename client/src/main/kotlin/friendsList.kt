@@ -1,7 +1,9 @@
+import declarations.ConversationHeader
 import declarations.avatar
 import declarations.conversation
 import declarations.conversationList
 import kotlinx.css.*
+import model.Conversation
 import model.MessagingChannel
 import react.*
 import react.dom.h2
@@ -21,14 +23,16 @@ class FriendsList : RComponent<FriendsListProps, RState>() {
                 margin = "30px"
             }
             h2 {+"Friends List: "}
-            conversationList {
-                props.channels.forEach {
-                    avatar{
+            props.channels.forEach {
+                child(ConversationHeader::class) {
+                    avatar {
                         attrs.name = it.name
                         attrs.src = it.iconSrc
                     }
-                    conversation {
-                        attrs.name = it.name
+                    child(ConversationHeader.Content::class) {
+                        attrs {
+                            userName = it.name
+                        }
                     }
                 }
             }
