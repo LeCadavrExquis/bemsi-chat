@@ -1,3 +1,5 @@
+package ui
+
 import declarations.*
 import kotlinx.css.*
 import model.Message
@@ -13,6 +15,9 @@ external interface ChatProps: RProps {
 }
 
 class Chat : RComponent<ChatProps, RState>() {
+    @Suppress("unused")
+    val styles = kotlinext.js.require("@chatscope/chat-ui-kit-styles/dist/default/styles.min.css")
+
     override fun RBuilder.render() {
         styledDiv {
             css {
@@ -48,7 +53,7 @@ class Chat : RComponent<ChatProps, RState>() {
                             messageBubble {
                                 attrs.model = json(
                                     "message" to msg.content,
-                                    "direction" to if(msg.senderName == props.friendName) "outgoing" else "incoming",
+                                    "direction" to if(msg.senderName == props.friendName) "incoming" else "outgoing",
                                     "sender" to msg.senderName,
                                     "position" to "single"
                                 )

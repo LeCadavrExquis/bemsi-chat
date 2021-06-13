@@ -1,11 +1,10 @@
+package ui
+
 import declarations.ConversationHeader
 import declarations.avatar
-import declarations.conversation
-import declarations.conversationList
 import kotlinx.css.*
 import kotlinx.html.js.onClickFunction
-import model.MessagingChannel
-import org.w3c.dom.events.Event
+import model.Channel
 import react.*
 import react.dom.div
 import react.dom.h2
@@ -13,11 +12,14 @@ import styled.css
 import styled.styledDiv
 
 external interface FriendsListProps : RProps {
-    var channels: List<MessagingChannel>
+    var channels: List<Channel>
     var setActiveFriend: (String) -> Unit
 }
 
 class FriendsList : RComponent<FriendsListProps, RState>() {
+    @Suppress("unused")
+    val styles = kotlinext.js.require("@chatscope/chat-ui-kit-styles/dist/default/styles.min.css")
+
     override fun RBuilder.render() {
         styledDiv {
             css {
