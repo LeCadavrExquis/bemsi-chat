@@ -14,12 +14,12 @@ public class WebSocketChatEventListener {
     private SimpMessageSendingOperations messagingTemplate;
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        System.out.println("Received a new web socket connection");
+//        System.out.println("Received a new web socket connection");
     }
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        String username = (String) headerAccessor.getSessionAttributes().get("username");
-        System.out.println("disconnected ws...");
+//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+//        String username = (String) headerAccessor.getSessionAttributes().get("username");
+//        System.out.println("disconnected ws...");
     }
 }
