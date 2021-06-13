@@ -6,7 +6,6 @@ import kotlinx.html.js.onClickFunction
 import org.w3c.dom.HTMLInputElement
 import react.*
 import react.dom.button
-import react.dom.div
 import react.dom.input
 import styled.css
 import styled.styledDiv

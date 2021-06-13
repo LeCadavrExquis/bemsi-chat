@@ -48,7 +48,7 @@ class Chat : RComponent<ChatProps, RState>() {
                             messageBubble {
                                 attrs.model = json(
                                     "message" to msg.content,
-                                    "direction" to if(msg.senderName == props.friendName) "outgoing" else "incoming",
+                                    "direction" to if(msg.senderName == props.friendName) "incoming" else "outgoing",
                                     "sender" to msg.senderName,
                                     "position" to "single"
                                 )

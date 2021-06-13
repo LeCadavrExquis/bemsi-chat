@@ -22,7 +22,7 @@ class App : RComponent<RProps, AppState>() {
     @Suppress("unused")
     val styles = require("@chatscope/chat-ui-kit-styles/dist/default/styles.min.css")
 
-    val userList = listOf<User>(
+    private val userList = listOf(
         User(id = "id1", name = "Filip", friends = listOf(
             "id2" to "Paweł",
             "id3" to "Marysia",
@@ -54,24 +54,7 @@ class App : RComponent<RProps, AppState>() {
                     position = Position.relative
                 }
                 logIn {
-                    onLogIn = { username ->
-                        if(userList.filter { it.name == username }.isNotEmpty()) {
-                            val tmpUser = userList.filter { it.name == username }.take(1)[0]
-                            var socket = js("new SockJS(\"http://localhost:8080/ws\")")
-                            console.log(socket)
-                            val tmpstomp = js("Stomp").over(socket)
-                            console.log(tmpstomp)
-                            tmpstomp.connect(js("{}"), this@App::connectionSuccess, {_-> println("connection failed")})
-                            setState {
-                                user = tmpUser
-                                friend = tmpUser.friends.take(1)[0]
-                                stomp = tmpstomp
-                            }
-                            true
-                        } else {
-                            false
-                        }
-                    }
+                    onLogIn = this@App::onLogIn
                 }
             }
         } else {
@@ -82,30 +65,15 @@ class App : RComponent<RProps, AppState>() {
                 friendsList {
                     channels = state.user.getChannels()
                     setActiveFriend = { pickedFriend ->
-                        val tmpFriend = state.user.friends.filter { it.second == pickedFriend }.take(1)[0]
                         setState{
-                            friend = tmpFriend
+                            friend = state.user.friends.filter { it.second == pickedFriend }.take(1)[0]
                         }
                     }
                 }
                 chat {
                     friendName = state.friend.second
                     messages = state.messages
-                    onSend = { msg ->
-                        val message = Message(
-                            status = "CHAT",
-                            content = msg,
-                            senderName = state.user.name,
-                            senderId = state.user.id,
-                            recipientId = state.friend.first,
-                            recipientName = state.friend.second,
-                            chatId = "",
-                            id = abs(Random.nextInt()).toString())
-                        sendMessage(message)
-                        setState {
-                            messages = messages + message
-                        }
-                    }
+                    onSend = this@App::sendMessage
                 }
             }
         }
@@ -116,29 +84,46 @@ class App : RComponent<RProps, AppState>() {
         friend = "" to ""
         messages = emptyList()
     }
-//
-//    fun connectToWS() {
-//        var socket = js("new SockJS(\"http://localhost:8080/ws\")")
-//        console.log(socket)
-//        val tmpstomp = js("Stomp").over(socket)
-//        console.log(tmpstomp)
-//        tmpstomp.connect(js("{}"), this@App::connectionSuccess, {_-> println("connection failed")})
-//        setState{
-//            stomp = tmpstomp
-//        }
-//    }
 
-    fun connectionSuccess() {
+    private fun onLogIn(username: String): Boolean{
+        if(userList.filter { it.name == username }.isNotEmpty()) {
+            val tmpUser = userList.filter { it.name == username }.take(1)[0]
+            var socket = js("new SockJS(\"http://localhost:8080/ws\")")
+            console.log(socket)
+            val tmpstomp = js("Stomp").over(socket)
+            console.log(tmpstomp)
+            tmpstomp.connect(js("{}"), this@App::connectionSuccess, {_-> println("connection failed")})
+            setState {
+                user = tmpUser
+                friend = tmpUser.friends.take(1)[0]
+                stomp = tmpstomp
+            }
+        } else {
+            return false
+        }
+        return true
+    }
+    private fun connectionSuccess() {
         println("connected !")
         state.stomp.subscribe("/user/${state.user.id}/queue/messages", this@App::onMessageReceived)
     }
-
-    fun onMessageReceived(payload: dynamic) {
+    private fun onMessageReceived(payload: dynamic) {
         console.log("message received !")
         console.log(payload)
     }
-
-    fun sendMessage(message: Message) {
+    private fun sendMessage(msg: String) {
+        val message = Message(
+            status = "CHAT",
+            content = msg,
+            senderName = state.user.name,
+            senderId = state.user.id,
+            recipientId = state.friend.first,
+            recipientName = state.friend.second,
+            chatId = "",
+            id = abs(Random.nextInt()).toString())
+        setState {
+            messages = messages + message
+        }
         state.stomp.send("/app/chat", js{"{}"},JSON.stringify(message))
     }
 }
