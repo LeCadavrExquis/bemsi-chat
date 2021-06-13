@@ -1,6 +1,5 @@
 import kotlinx.browser.window
-import kotlinx.css.Display
-import kotlinx.css.display
+import kotlinx.css.*
 import kotlinx.html.InputType
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onClickFunction
@@ -27,7 +26,9 @@ class LogIn : RComponent<LogInProps, LogInState>() {
     override fun RBuilder.render() {
         styledDiv {
             css {
-                display = Display.listItem
+                position = Position.absolute
+                top = LinearDimension("50%")
+                left = LinearDimension("50%")
             }
             input {
                 attrs{

@@ -4,7 +4,6 @@ import declarations.conversation
 import declarations.conversationList
 import kotlinx.css.*
 import kotlinx.html.js.onClickFunction
-import model.Conversation
 import model.MessagingChannel
 import org.w3c.dom.events.Event
 import react.*

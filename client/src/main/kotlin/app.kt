@@ -48,23 +48,29 @@ class App : RComponent<RProps, AppState>() {
             }
         }
         if(state.user.name == "guest"){
-            logIn {
-                onLogIn = { username ->
-                    if(userList.filter { it.name == username }.isNotEmpty()) {
-                        val tmpUser = userList.filter { it.name == username }.take(1)[0]
-                        var socket = js("new SockJS(\"http://localhost:8080/ws\")")
-                        console.log(socket)
-                        val tmpstomp = js("Stomp").over(socket)
-                        console.log(tmpstomp)
-                        tmpstomp.connect(js("{}"), this@App::connectionSuccess, {_-> println("connection failed")})
-                        setState {
-                            user = tmpUser
-                            friend = tmpUser.friends.take(1)[0]
-                            stomp = tmpstomp
+            styledDiv {
+                css {
+                    height = 200.px
+                    position = Position.relative
+                }
+                logIn {
+                    onLogIn = { username ->
+                        if(userList.filter { it.name == username }.isNotEmpty()) {
+                            val tmpUser = userList.filter { it.name == username }.take(1)[0]
+                            var socket = js("new SockJS(\"http://localhost:8080/ws\")")
+                            console.log(socket)
+                            val tmpstomp = js("Stomp").over(socket)
+                            console.log(tmpstomp)
+                            tmpstomp.connect(js("{}"), this@App::connectionSuccess, {_-> println("connection failed")})
+                            setState {
+                                user = tmpUser
+                                friend = tmpUser.friends.take(1)[0]
+                                stomp = tmpstomp
+                            }
+                            true
+                        } else {
+                            false
                         }
-                        true
-                    } else {
-                        false
                     }
                 }
             }
