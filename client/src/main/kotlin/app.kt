@@ -1,20 +1,27 @@
+import kotlinext.js.js
+import kotlinext.js.require
 import kotlinx.css.*
 import model.Message
 import model.User
+import org.w3c.dom.WebSocket
 import react.*
 import styled.css
 import styled.styledDiv
 import styled.styledH1
+import kotlin.math.abs
+import kotlin.random.Random
 
 external interface AppState : RState {
     var user: User
     var messages: List<Message>
-    var friendName: String
+    var friend: Pair<String, String>
+    var stomp: dynamic
+    var sessionId: dynamic
 }
 
 class App : RComponent<RProps, AppState>() {
     @Suppress("unused")
-    val styles = kotlinext.js.require("@chatscope/chat-ui-kit-styles/dist/default/styles.min.css")
+    val styles = require("@chatscope/chat-ui-kit-styles/dist/default/styles.min.css")
 
     override fun RBuilder.render() {
         styledH1 {
@@ -33,15 +40,21 @@ class App : RComponent<RProps, AppState>() {
                 channels = state.user.getChannels()
             }
             chat {
-                friendName = state.friendName
+                friendName = state.friend.second
                 messages = state.messages
                 onSend = { msg ->
-                    //TODO: send to backend
+                    val message = Message(
+                        status = "CHAT",
+                        content = msg,
+                        senderName = state.user.name,
+                        senderId = state.user.id,
+                        recipientId = state.friend.first,
+                        recipientName = state.friend.second,
+                        chatId = "",
+                        id = abs(Random.nextInt()).toString())
+                    state.stomp.send("/app/chat", js{"{}"},JSON.stringify(message))
                     setState {
-                        messages = messages + Message(
-                                    message = msg,
-                                    direction = "outgoing",
-                                    sender = user.name)
+                        messages = messages + message
                     }
                 }
             }
@@ -49,22 +62,36 @@ class App : RComponent<RProps, AppState>() {
     }
 
     override fun AppState.init() {
-        user = User("12345", "Alicja", listOf(
+        user = User("username", "Alicja", listOf(
             "Paweł",
             "Michał",
             "Marysia",
             "Filip"
         ))
-        messages = listOf(
-            Message("hejka", "incoming", "Michał"),
-            Message("elko", "outgoing", "Michał"),
-            Message("test1", "incoming", "Michał"),
-            Message("test2", "incoming", "Michał"),
-            Message("test3", "incoming", "Michał"),
-            Message("oki", "outgoing", "Michał"),
-            Message("doki", "outgoing", "Michał")
-        )
-        friendName = "Michał"
+        messages = emptyList()
+        friend = "mID" to "Michał"
+        var socket = js("new SockJS(\"http://localhost:8080/ws\")")
+        console.log(socket)
+        val tmpstomp = js("Stomp").over(socket)
+        console.log(tmpstomp)
+        tmpstomp.connect(js("{}"), this@App::connectionSuccess, {_-> println("connection failed")})
+        stomp = tmpstomp
+    }
+
+    fun connectionSuccess() {
+//        var tmpurl = state.stomp.ws._transport.url.toString().split("/").takeLast(2)
+//
+//        console.log("Your current session is: /${tmpurl[0]}/");
+//        setState{
+//            sessionId = "/${tmpurl[0]}"
+//        }
+        println("connected !")
+        state.stomp.subscribe("/user/${state.user.id}/queue/messages", this@App::onMessageReceived)
+    }
+
+    fun onMessageReceived(payload: dynamic) {
+        console.log("message received !")
+        console.log(payload)
     }
 }
 
