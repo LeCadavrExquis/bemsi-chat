@@ -3,6 +3,7 @@ import kotlinext.js.require
 import kotlinx.css.*
 import model.Message
 import model.User
+import org.khronos.webgl.Uint8Array
 import react.*
 import styled.css
 import styled.styledDiv
@@ -18,6 +19,8 @@ external interface AppState : RState {
     var messages: List<Message>
     var friend: Pair<String, String>
     var stomp: dynamic
+    var symmetricKey: String
+    var asymKeyPair: dynamic
 }
 
 class App : RComponent<RProps, AppState>() {
@@ -42,7 +45,7 @@ class App : RComponent<RProps, AppState>() {
 
     override fun RBuilder.render() {
         styledH1 {
-            +"Bemsi ui.Chat App"
+            +"Bemsi Chat App"
             css {
                 fontSize = 4.em
                 fontWeight = FontWeight.bold
@@ -57,6 +60,7 @@ class App : RComponent<RProps, AppState>() {
                 }
                 logIn {
                     onLogIn = this@App::onLogIn
+                    openChannel = this@App::openChannel
                 }
             }
         } else {
@@ -70,12 +74,15 @@ class App : RComponent<RProps, AppState>() {
                         setState{
                             friend = state.user.friends.filter { it.second == pickedFriend }.take(1)[0]
                         }
+                        openChannel()
                     }
                 }
                 chat {
                     friendName = state.friend.second
                     messages = state.messages
-                    onSend = this@App::sendMessage
+                    onSend = {
+                        sendMessage(encrypt(it, state.symmetricKey), "CHAT")
+                    }
                 }
             }
         }
@@ -91,9 +98,7 @@ class App : RComponent<RProps, AppState>() {
         if(userList.filter { it.name == username }.isNotEmpty()) {
             val tmpUser = userList.filter { it.name == username }.take(1)[0]
             var socket = js("new SockJS(\"http://localhost:8080/ws\")")
-            console.log(socket)
             val tmpstomp = js("Stomp").over(socket)
-            console.log(tmpstomp)
             tmpstomp.connect(js("{}"), this@App::connectionSuccess, {_-> println("connection failed")})
             setState {
                 user = tmpUser
@@ -106,16 +111,59 @@ class App : RComponent<RProps, AppState>() {
         return true
     }
     private fun connectionSuccess() {
-        println("connected !")
         state.stomp.subscribe("/user/${state.user.id}/queue/messages", this@App::onMessageReceived)
+        openChannel()
+    }
+    private fun openChannel() {
+        val asymKeys = js("nacl.box").keyPair()
+        val symKey = js("nacl.util.encodeBase64(nacl.randomBytes(nacl.secretbox.keyLength))")
+        setState{
+            symmetricKey = symKey
+            asymKeyPair = asymKeys
+        }
+        sendMessage("publicKey", "KEY")
+        println(state.symmetricKey)
+        println(state.asymKeyPair)
+    }
+    private fun encrypt(msg: String, key: dynamic): String {
+        val keyUint8Array = js("nacl.util").decodeBase64(key)
+        val nonce = js("nacl.randomBytes(nacl.secretbox.nonceLength)")
+        val messageUint8 = js("nacl.util.decodeUTF8(msg)")
+        val box = js("nacl").secretbox(messageUint8, nonce, keyUint8Array)
+
+        var encryptedMessage = js("new Uint8Array(nonce.length + box.length)")
+        encryptedMessage.set(nonce)
+        encryptedMessage.set(box, nonce.length)
+
+        return js("nacl.util.encodeBase64(encryptedMessage)")
+    }
+    private fun decrypt(msg: String, key: dynamic): String {
+        val keyUint8Array = js("nacl.util").decodeBase64(key)
+        val messageWithNonceAsUint8Array = js("nacl.util").decodeBase64(msg);
+        val nonce = js("messageWithNonceAsUint8Array.slice(0, nacl.secretbox.nonceLength)")
+        val message = js("messageWithNonceAsUint8Array.slice(nacl.secretbox.nonceLength, msg.length)")
+
+        val decrypted = js("nacl.secretbox").open(message, nonce, keyUint8Array)
+
+        if (!decrypted) {
+            println("Failed to decrypt ...")
+        }
+
+        return js("nacl.util").encodeUTF8(decrypted)
     }
     private fun onMessageReceived(payload: dynamic) {
         console.log("message received !")
         console.log(payload)
+        val message: Message = JSON.parse(payload.body)
+        println(message)
+        if(message.status == "CHAT") {
+            val decryptedMessage = decrypt(message.content, state.symmetricKey)
+            println(decryptedMessage)
+        }
     }
-    private fun sendMessage(msg: String) {
+    private fun sendMessage(msg: String, status: String) {
         val message = Message(
-            status = "CHAT",
+            status = status,
             content = msg,
             senderName = state.user.name,
             senderId = state.user.id,
@@ -123,8 +171,10 @@ class App : RComponent<RProps, AppState>() {
             recipientName = state.friend.second,
             chatId = "",
             id = abs(Random.nextInt()).toString())
-        setState {
-            messages = messages + message
+        if(status == "CHAT"){
+            setState {
+                messages = messages + message
+            }
         }
         state.stomp.send("/app/chat", js{"{}"},JSON.stringify(message))
     }
