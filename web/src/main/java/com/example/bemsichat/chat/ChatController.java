@@ -14,6 +14,6 @@ public class ChatController {
     public void processMessage(@Payload Message message) {
         System.out.println(message.toString());
         messagingTemplate.convertAndSendToUser(
-                message.getSenderId(),"/queue/messages", message);
+                message.getRecipientId(),"/queue/messages", message);
     }
 }

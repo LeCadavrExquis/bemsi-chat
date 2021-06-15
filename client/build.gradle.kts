@@ -36,9 +36,8 @@ kotlin {
                 implementation("org.jetbrains:kotlin-redux:4.0.5-pre.148-kotlin-1.4.30")
                 implementation("org.jetbrains:kotlin-react-redux:7.2.2-pre.148-kotlin-1.4.30")
 
-//                implementation(npm("sockjs-client", "1.5.1"))
-//                implementation(npm("@stomp/stompjs", "6.1.0"))
-
+                implementation(npm("jsencrypt", "3.2.0"))
+                implementation(npm("cryptico", "1.0.2"))
                 implementation(npm("jquery", "3.6.0"))
                 implementation(npm("react-bootstrap", "1.6.0"))
                 implementation(npm("@chatscope/chat-ui-kit-react", "1.8.1"))

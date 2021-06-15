@@ -2,7 +2,7 @@ package com.example.bemsichat.chat;
 
 public class Message {
     private String id;
-    private String chatId;
+    private String nonce;
     private String senderId;
     private String recipientId;
     private String senderName;
@@ -18,12 +18,12 @@ public class Message {
         this.id = id;
     }
 
-    public String getChatId() {
-        return chatId;
+    public String getNonce() {
+        return nonce;
     }
 
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
+    public void setNonce(String nonce) {
+        this.nonce = nonce;
     }
 
     public String getSenderId() {
