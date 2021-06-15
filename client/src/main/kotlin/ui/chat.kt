@@ -2,8 +2,12 @@ package ui
 
 import declarations.*
 import kotlinx.css.*
+import kotlinx.html.js.onClickFunction
 import model.Message
+import org.w3c.dom.events.Event
 import react.*
+import react.dom.button
+import react.dom.div
 import styled.css
 import styled.styledDiv
 import kotlin.js.json
@@ -12,6 +16,7 @@ external interface ChatProps: RProps {
     var friendName: String
     var messages: List<Message>
     var onSend: (String) -> Unit
+    var onEncrypt: (Event) -> Unit
 }
 
 class Chat : RComponent<ChatProps, RState>() {
@@ -67,6 +72,12 @@ class Chat : RComponent<ChatProps, RState>() {
                         }
                     }
                 }
+            }
+        }
+        div{
+            button {
+                +"Encrypt"
+                attrs.onClickFunction = props.onEncrypt
             }
         }
     }

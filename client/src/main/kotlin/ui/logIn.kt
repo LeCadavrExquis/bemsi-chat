@@ -14,7 +14,6 @@ import styled.styledDiv
 
 external interface LogInProps: RProps {
     var onLogIn: (String) -> Boolean
-    var openChannel: () -> Unit
 }
 
 external interface LogInState: RState {
@@ -48,8 +47,6 @@ class LogIn : RComponent<LogInProps, LogInState>() {
                 attrs.onClickFunction = {
                     if(!props.onLogIn(state.username)) {
                         window.alert("Wrong username")
-                    } else {
-                        props.openChannel
                     }
                 }
                 +"Log in"
