@@ -11,4 +11,6 @@ data class Message(
     val recipientName: String,
     val content: String,
     val status: String = "CHAT"
-)
+) {
+
+}

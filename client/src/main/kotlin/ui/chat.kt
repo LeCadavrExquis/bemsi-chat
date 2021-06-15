@@ -9,6 +9,7 @@ import react.*
 import react.dom.button
 import react.dom.div
 import styled.css
+import styled.styledButton
 import styled.styledDiv
 import kotlin.js.json
 
@@ -17,6 +18,7 @@ external interface ChatProps: RProps {
     var messages: List<Message>
     var onSend: (String) -> Unit
     var onEncrypt: (Event) -> Unit
+    var encryptionActive: Boolean
 }
 
 class Chat : RComponent<ChatProps, RState>() {
@@ -54,7 +56,8 @@ class Chat : RComponent<ChatProps, RState>() {
                         }
                     }
                     messageList {
-                        props.messages.forEach {  msg ->
+                        props.messages.filter { it.senderName == props.friendName || it.recipientName == props.friendName }
+                            .forEach {  msg ->
                             messageBubble {
                                 attrs.model = json(
                                     "message" to msg.content,
@@ -75,7 +78,10 @@ class Chat : RComponent<ChatProps, RState>() {
             }
         }
         div{
-            button {
+            styledButton {
+                css {
+                    color = if (props.encryptionActive) Color.green else Color.gray
+                }
                 +"Encrypt"
                 attrs.onClickFunction = props.onEncrypt
             }

@@ -90,6 +90,7 @@ class App : RComponent<RProps, AppState>() {
                     onEncrypt = {
                         openE2E()
                     }
+                    encryptionActive = state.e2eActive
                 }
             }
         }
@@ -131,9 +132,6 @@ class App : RComponent<RProps, AppState>() {
         println("sym key: $symKey")
         asymKeyPair = asymKeys
         symmetricKey = symKey
-        setState{
-            e2eActive = true
-        }
     }
     private fun openE2E() {
         initKeys()
@@ -153,14 +151,16 @@ class App : RComponent<RProps, AppState>() {
         println("message recived: ${message.id}")
         handleUserCom(message)
     }
-    private fun sendMessage(msg: Message, key: dynamic = null) {
+    private fun sendMessage(msg: Message) {
         if (msg.status == "CHAT") {
             setState {
                 messages = messages + msg
             }
         }
+        val msgToSend = if (state.e2eActive) encrypt(msg, symmetricKey) else msg
+
         stomp.send("/app/chat", js{"{}"},
-            JSON.stringify(if (key != null) encrypt(msg, key) else msg))
+            JSON.stringify(msgToSend))
     }
     fun encrypt(msg: Message, key: dynamic): Message {
         println("encript method")
@@ -247,6 +247,9 @@ class App : RComponent<RProps, AppState>() {
                     recipientId = state.friend.first,
                     recipientName = state.friend.second)
                 )
+                setState{
+                    e2eActive = true
+                }
             }
             "SECRET" -> {
                 println("secret recived: ${msg.content}")
@@ -263,6 +266,7 @@ class App : RComponent<RProps, AppState>() {
                 } else {
                     setState {
                         symmetricKey = js("nacl.util").encodeBase64(decrypted)
+                        e2eActive = true
                     }
                 }
             }
