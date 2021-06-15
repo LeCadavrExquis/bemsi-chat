@@ -18,7 +18,7 @@ The aim of the project is to create end-to-end (OTR) chat.
 Gradle is required to the run this project. It's available [here](https://gradle.org/install/).
 
 ```
-gradle bootRun
+./gradlew web:bootRun
 ```
 
 ### Test
