@@ -9,6 +9,7 @@ The aim of the project is to create end-to-end (OTR) chat.
 - Java 11
 - Kotlin
 - SpringBoot
+- React
 - Gradle
 - Git
 
@@ -17,5 +18,9 @@ The aim of the project is to create end-to-end (OTR) chat.
 Gradle is required to the run this project. It's available [here](https://gradle.org/install/).
 
 ```
-gradle web:bootRun
+gradle bootRun
 ```
+
+### Test
+Do testowania można zalogować sie na konta (Filip, Paweł, Michał)
+W consoli zapisywane są logi z pracy aplikacji
