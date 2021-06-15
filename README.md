@@ -21,6 +21,8 @@ Gradle is required to the run this project. It's available [here](https://gradle
 ./gradlew web:bootRun
 ```
 
+Application exposes serwer on local port 8080 
+
 ### Test
 Do testowania można zalogować sie na konta (Filip, Paweł, Michał)
 W consoli zapisywane są logi z pracy aplikacji
