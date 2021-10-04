@@ -10,8 +10,6 @@ The aim of the project is to create end-to-end (OTR) chat.
 - Kotlin
 - SpringBoot
 - React
-- Gradle
-- Git
 
 ### Build instructions
 
@@ -26,5 +24,4 @@ gradle wrapper --gradle-version 7.0 --distribution-type all
 Application exposes serwer on local port 8080 
 
 ### Test
-Do testowania można zalogować sie na konta (Filip, Paweł, Michał)
-W consoli zapisywane są logi z pracy aplikacji
+Testing acounts: Filip, Paweł, Michał
